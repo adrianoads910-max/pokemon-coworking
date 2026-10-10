@@ -23,8 +23,10 @@ async function check() {
   return updateInfo();
 }
 
+// pokemon-coworking isn't on npm: the registry entry is the original coworking-agents, so asking it would
+// point you at a different app. Kept for the day this fork is published; on with COWORKING_UPDATE_CHECK=1.
 function startChecks() {
-  if (timer || process.env.COWORKING_NO_UPDATE_CHECK) return Promise.resolve(null);
+  if (timer || process.env.COWORKING_NO_UPDATE_CHECK || !process.env.COWORKING_UPDATE_CHECK) return Promise.resolve(null);
   timer = setInterval(check, 6 * 3600e3);
   timer.unref();
   return check();

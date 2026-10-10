@@ -45,12 +45,13 @@ document.addEventListener('keydown', e => {
   else if (k === 'r' || k === 'R') openReport();
   else if (k === 't' || k === 'T') openReport('today');
   else if (k === 'g' || k === 'G') openReport('feed');
-  else if (k === 'c' || k === 'C') openReport('ach');
+  else if ((k === 'c' || k === 'C') && !Poke.on) openReport('ach');
   else if (k === 'q' || k === 'Q') openReport('queue');
   else if (k === 'e' || k === 'E') { decorOn = !decorOn; store.set('decor', decorOn); toast(`<b>${esc(decorOn ? T.decorOn : T.decorOff)}</b>`, 'ok'); }
   else if (k === 'f' || k === 'F') document.getElementById('btn-focus').click();
   else if (k === 'l' || k === 'L') { achBump('lights'); lightsOn = !lightsOn; store.set('lights', lightsOn); lastHits = ''; renderOverlay(); }
   else if (k === 'b' || k === 'B') { if (floors.length > 1) setBuilding(!building); }
   else if (k === 'h' || k === 'H') toggleReplay(replayEl.hidden);
+  else if (k === 'p' || k === 'P') { Poke.setOn(!Poke.on); lastHits = ''; renderOverlay(); }
   else if (k === '?') toast(`<b>${esc(T.keys.helpTitle)}</b>${esc(T.keys.help)}`, '');
 });

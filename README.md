@@ -1,3 +1,56 @@
+<h1 align="center">pokemon-coworking</h1>
+
+<p align="center"><b>A Pokémon-themed pixel office for your AI coding agents.</b><br>Every repository is a climate zone; every Claude Code or Codex session is a Pokémon of that zone's type, working at its desk, levelling up and evolving as it works.</p>
+
+<p align="center"><img src="docs/pokemon-day.png" alt="The Bioma office by day: climate-zone rooms (psychic temple, volcano, storm, tropical lake, ice cave, forest) with Pokémon at CRT desks, paper labels, a safari garden and the service wing"></p>
+
+Built on top of [coworking-agents](https://github.com/ChaconLucas/coworking-agents) by Lucas Chacon (MIT). The session reading, the live server and the agent panel are his; this fork redraws the office after the **Bioma Coworking** design system and turns the agents into Pokémon.
+
+## Quick start
+
+```bash
+git clone https://github.com/adrianoads910-max/pokemon-coworking
+cd pokemon-coworking
+npm start                 # opens the office with the Pokémon theme (zero dependencies, Node 18+)
+npm start -- --demo       # a fake office with every state, no sessions needed
+npm run classic           # the original office
+```
+
+In the page, **P** switches between the Pokémon office and the classic one. Add `&nome=My office` to the link to put your own name in the top bar.
+
+## What's different
+
+| | |
+|---|---|
+| **Climate zones** | Each repository gets one of 13 biomes — volcano, tropical lake, forest, storm, ice cave, canyon, mountain, swamp, sky, haunted tower, psychic temple, dragon's lair, steel works — with its own floor, desk material and animated weather (embers, rain and a waterfall, falling leaves and fireflies, lightning, snow…). |
+| **Agents are Pokémon** | A session becomes a Pokémon of its zone's type, fixed per session and never repeated inside a room: back sprite while it types, front sprite when it thinks or asks, the white **!** when it needs you. Subagents show up in the gym. |
+| **Levels and evolution** | Level = 5 + the session's turns (measured from the transcript). It evolves at 20 and 60 turns (levels 25 and 65), with a white flash and an *Evolved!* toast. |
+| **Pokémon card** | Click a Pokémon: the panel shows its Pokédex number, types, level, the next evolution and the 4 latest moves it knows at that level, with type, power, accuracy, PP and effect. |
+| **Service wing** | Healing center (your turn), gym (delegating), day care (asleep). Claude itself floats around the office as a **Haunter**. |
+| **Work first** | No shop, achievements, paper or arcade in this office. What stays: each agent's labels and panel, the queue, usage and history, and **Go to terminal** / reply from the speech cards. |
+| **Day and night** | A night veil over the world with lights added on top (screens, lava, lamps, fireflies); labels and the top bar never darken. |
+
+<p align="center"><img src="docs/pokemon-night.png" width="49%" alt="The office at night"> <img src="docs/pokemon-panel.png" width="40%" alt="The agent panel with the Pokémon card: Meganium, level 69, and its moves"></p>
+
+## Pokémon data
+
+Sprites, type lists, evolution lines and moves come from [PokéAPI](https://pokeapi.co) and the [PokeAPI/sprites](https://github.com/PokeAPI/sprites) repository. The local server fetches each one once, caches it in `~/.config/coworking-agents/pokemon-cache/` and serves it to the page from `127.0.0.1` (the page's content security policy only allows its own origin). Nothing about your sessions is sent anywhere. Pokémon up to #807, legendaries and mythicals left out.
+
+Move names and effects are in English (PokéAPI has no Portuguese for moves).
+
+`?skin=original` draws the design system's own original creatures instead of Pokémon sprites.
+
+## Credits and notice
+
+- Original app: [coworking-agents](https://github.com/ChaconLucas/coworking-agents) © Lucas Chacon, MIT.
+- Design: the *Bioma Coworking* design system (`docs/POKEMON_OFFICE.md` has the brief, in Portuguese).
+- Pokémon and Pokémon character names are trademarks of Nintendo, Game Freak and The Pokémon Company. This is an unofficial fan project, not affiliated with or endorsed by them. No sprites are stored in this repository; they are downloaded from PokéAPI at run time.
+
+---
+
+<details>
+<summary><b>The original coworking-agents documentation</b> (most of it still applies; note that <code>npx coworking-agents</code> installs the original app, not this fork)</summary>
+
 <p align="center">
   <img src="docs/logo.png" width="112" alt="coworking-agents logo">
 </p>
@@ -341,3 +394,5 @@ The server also exposes `/api/state` (the snapshot, including a per-session time
 ## License
 
 MIT, see [LICENSE](LICENSE). The Silkscreen font is under the SIL Open Font License (`public/fonts/OFL.txt`).
+
+</details>

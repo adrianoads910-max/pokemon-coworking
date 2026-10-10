@@ -79,7 +79,7 @@ function drawExtraPlants() {
 }
 
 // the mascot takes the cat's place and behaviour (visits, petting)
-function drawMascot(x, y, mode, t, flip) { return drawCritter(MASCOTS.includes(prog.mascot) ? prog.mascot : 'cat', x, y, mode, t, flip); }
+function drawMascot(x, y, mode, t, flip) { if (Poke.drawHaunter(x, y, mode, t, flip)) return; return drawCritter(MASCOTS.includes(prog.mascot) ? prog.mascot : 'cat', x, y, mode, t, flip); }
 function drawCritter(m, x, y, mode, t, flip) {
   const f = ((t / 300) | 0) % 2, ink = PAL.ink, walk = mode === 'walk', sleep = mode === 'sleep';
   if (m === 'cat') return Art.drawCat(x, y, mode, t, flip);

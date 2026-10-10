@@ -206,6 +206,7 @@ function checkAchievements() {
   const need = live.filter(p => p.state === 'needs_you' || p.state === 'waiting').length;
   if (achQueueWas >= 2 && need === 0) achBump('zeroQueue');
   achQueueWas = need;
+  if (Poke.on) return; // the Bioma office has no achievements
   if (!usageData || !usageData.days) return; // history not scanned yet: don't announce half the picture
   const st = achState(), now = Object.fromEntries(st.map(a => [a.id, a.tier]));
   if (prog.levels) {

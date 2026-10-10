@@ -9,6 +9,7 @@ const { focus, sendText, launch } = require('./focus');
 const { usage } = require('./usage');
 const { updateInfo } = require('./update');
 const progress = require('./progress');
+const pokemon = require('./pokemon');
 
 const PUBLIC = path.join(__dirname, '..', 'public');
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon' };
@@ -193,6 +194,12 @@ function start({ port = 4777, host = '127.0.0.1', privacy = false, interval = 10
     if (url.pathname === '/api/report') return send(res, 200, 'application/json', JSON.stringify(demo ? demoReport() : report({ privacy })));
     if (url.pathname === '/api/state') return send(res, 200, 'application/json', safeSnapshot());
     if (url.pathname === '/api/ping') return send(res, 200, 'application/json', '{"ok":true}');
+    const poke = url.pathname.startsWith('/api/pokemon/') && pokemon.route(url.pathname);
+    if (poke) {
+      poke.then(r => { res.writeHead(200, { 'Content-Type': r.type, 'Cache-Control': 'private, max-age=604800' }); res.end(r.body); },
+        () => { if (!res.headersSent) send(res, 502, 'text/plain', 'pokemon unavailable'); });
+      return;
+    }
 
     const rel = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
     const file = path.join(PUBLIC, path.normalize(rel));

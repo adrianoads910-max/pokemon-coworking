@@ -236,6 +236,8 @@ function renderHelp() {
       helpEl.appendChild(el);
       helpCards.set(p.id, el);
     }
+    // the face may have been drawn before the Pokémon sprite arrived: swap it in once it has
+    if (Poke.on && !el.querySelector('.face[data-poke]')) { const f = Art.portrait(p.id, 'open'); if (f.dataset.poke) { f.className = 'face'; el.querySelector('.who').replaceChildren(f); } }
     const kind = p.state === 'needs_you' || p.state === 'waiting' ? 'urgent' : 'done';
     el.classList.toggle('done', kind === 'done');
     const msg = helpText(p), head = `${p.name}${p.repo ? ' · ' + p.repo.name : ''}`;

@@ -43,6 +43,25 @@ function renderUsage(P) {
     <p class="note">${esc(U.note)}</p>`;
 }
 
+// Bioma theme: the session's Pokémon — number, types, level (from its turns) and the moves it knows
+function pokeCard(p) {
+  const c = Poke.on && Poke.cardOf(p), K = T.panel.poke;
+  if (!c) return '';
+  if (c.loading) return `<section class="card poke-card"><small>${esc(K.loading)}</small></section>`;
+  const TC = Bioma.TYPE_COLOR, tname = t => K.types[t] || t, cap = s => String(s).replace(/(^|[\s-])\w/g, m => m.toUpperCase());
+  const evo = c.stage && c.stage.next ? K.nextEvo(Poke.levelOf(c.stage.next)) : K.finalForm;
+  const nextLv = c.stage && c.stage.next ? Poke.levelOf(c.stage.next) : 100, prevLv = c.stage && c.stage.stage > 1 ? Poke.levelOf([0, 20, 60][c.stage.stage - 1]) : 5;
+  const pct = Math.max(2, Math.min(100, (c.level - prevLv) / Math.max(1, nextLv - prevLv) * 100));
+  return `<section class="card poke-card">
+    <div class="pk-head"><b>${esc(cap(c.info.name))}</b><span class="pk-no">#${String(c.mon).padStart(3, '0')}</span><span class="pk-lv" title="${esc(K.levelNote)}">${esc(K.lv)} ${c.level}</span></div>
+    <div class="pk-types">${c.info.types.map(t => `<span style="background:${TC[t] || '#888'}">${esc(tname(t))}</span>`).join('')}<span class="pk-evo">${esc(evo)}</span></div>
+    <div class="pk-xp" title="${esc(K.levelNote)}"><i style="width:${pct.toFixed(1)}%"></i></div>
+    <h3>${esc(K.moves)}</h3>
+    <ul class="pk-moves">${c.moves.map(m => `<li style="--t:${TC[m.type] || '#8a8f98'}">
+      <div class="pk-mv"><b>${esc(m.label || m.name)}</b>${m.type ? `<span class="pk-ty">${esc(tname(m.type))}</span>` : ''}<span class="pk-ml">${esc(K.lv)} ${m.level}</span></div>
+      ${m.type ? `<div class="pk-st"><span>${esc(K.power)} <b>${m.power ?? '—'}</b></span><span>${esc(K.acc)} <b>${m.accuracy != null ? m.accuracy + '%' : '—'}</b></span><span>${esc(K.pp)} <b>${m.pp ?? '—'}</b></span><span>${esc(K.cls[m.cls] || m.cls)}</span></div>${m.effect ? `<p>${esc(m.effect)}</p>` : ''}` : ''}</li>`).join('')}</ul>
+  </section>`;
+}
 function renderPanel() {
   document.body.classList.toggle('panel-open', !!(selected && data));
   if (!selected || !data) { panel.hidden = true; return; }
@@ -94,6 +113,7 @@ function renderPanel() {
   panelBody.innerHTML = `
     <header class="ph"><div class="ph-face"></div><div><h2>${esc(p.name)}</h2><p class="sub">${esc(p.title || '—')}</p>
       <div class="pills"><span class="pill" style="background:${agentOf(p).color}">${esc(agentOf(p).label)}</span><span class="pill" style="background:${col}">${esc(T.states[p.state] || p.state)}</span>${p.permissionMode ? `<span class="pill ghost" title="${esc(P.mode)}">${esc(P.modes[p.permissionMode] || p.permissionMode)}</span>` : ''}</div></div></header>
+    ${pokeCard(p)}
     ${canCompact(p) ? `<div class="actions"><button class="btn compact" data-compact-panel="${esc(p.id)}">⤓ ${esc(T.alerts.compact)} · ${Math.round(ctxPct * 100)}%</button></div>` : ''}
     <div class="actions"><button class="btn" id="btn-goto" data-id="${esc(p.id)}">›_ ${esc(p.agent === 'codex' && !p.pid ? P.gotoCodex : P.goto)}</button><span class="note" id="goto-msg"></span></div>
     ${p.coarse ? `<p class="note">${esc(T.panel.coarse)}</p>` : ''}
@@ -106,7 +126,7 @@ function renderPanel() {
       <div><b>${Number(td.tools) || 0}</b><small>${esc(P.toolsToday)}</small></div>
       <div><b>${Number(td.prompts) || 0}</b><small>${esc(P.promptsToday)}</small></div>
       <div><b>${Number(td.files) || 0}</b><small>${esc(P.filesToday)}</small></div>
-      <div><b>${fmtK(Number(td.outTokens) || 0)}</b><small>${esc(P.tokensOut)}</small></div></div>
+      <div><b>${fmtK(Number(td.outTokens) || 0)}</b><small>${esc(P.tokensOut)}</small></div>${(s => s ? `<div title="${esc(s.next ? P.evolveAt(s.next) : P.evolveMax)}"><b>${s.stage}/${s.of}</b><small>${esc(P.evolution)}</small></div>` : '')(Poke.on && Poke.stageOf(p.id))}</div>
     ${p.files && p.files.length ? `<h3>${esc(P.filesNow)}</h3><ul class="list files">${p.files.map(f => `<li><span class="k">✎</span><code title="${esc(f.repo + '/' + f.rel)}">${esc(f.rel)}</code><span class="t">${esc(ago(data.now - f.at))}</span></li>`).join('')}</ul>` : ''}
     ${p.subagents.length ? `<h3>${P.team}</h3><ul class="list">${p.subagents.map(a => `<li><span class="k">${KIND_ICON[a.state] || '•'}</span><span><b>${esc(a.type)}</b> ${esc(a.description)}${a.doing ? `<br><span class="note">${esc(a.doing)}</span>` : ''}</span></li>`).join('')}</ul>` : ''}
     ${p.usage ? `<h3>${esc(T.usage.session)}</h3><div class="stats tok"><div><b>${fmtTok(p.usage.output)}</b><small>${esc(T.usage.out)}</small></div><div><b>${fmtTok(p.usage.input + p.usage.cacheWrite)}</b><small>${esc(T.usage.in)}</small></div><div><b>${fmtTok(p.usage.cacheRead)}</b><small>${esc(T.usage.cache)}</small></div>${p.cost ? `<div class="cost" title="${esc(T.usage.costNote)}"><b>≈ ${esc(fmtUSD(p.cost.usd))}${p.cost.partial ? '+' : ''}</b><small>${esc(T.usage.cost)}</small></div>` : ''}</div>` : ''}

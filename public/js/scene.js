@@ -379,6 +379,7 @@ function drawRobot(t) {
 }
 
 function drawScene(t, dt) {
+  if (Poke.on) return Bioma.drawScene(t, dt); // the Pokémon theme draws its own office (bioma.js)
   const now = Date.now();
   const hr = new Date().getHours() + new Date().getMinutes() / 60;
   const sky = Art.skyFor(styleHour(qs.get('hour') ? Number(qs.get('hour')) : hr));

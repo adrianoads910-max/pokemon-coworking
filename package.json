@@ -1,7 +1,7 @@
 {
-  "name": "coworking-agents",
+  "name": "pokemon-coworking",
   "version": "0.3.1",
-  "description": "A pixel-art coworking office for your AI coding agents (Claude Code, Codex, …): see who's working, who needs you, and who's editing the same checkout.",
+  "description": "A Pokémon-themed pixel office for your AI coding agents: every repository is a climate zone, every Claude Code / Codex session a Pokémon that levels up and evolves as it works.",
   "bin": {
     "coworking-agents": "bin/coworking-agents.js"
   },
@@ -22,13 +22,16 @@
     "node": ">=18"
   },
   "scripts": {
-    "start": "node bin/coworking-agents.js",
+    "start": "node bin/coworking-agents.js --pokemon",
+    "classic": "node bin/coworking-agents.js",
     "demo": "node bin/coworking-agents.js --demo",
     "test": "node test/run.js",
     "screenshots": "bash scripts/screenshots.sh",
     "video": "node scripts/record-video.js"
   },
   "keywords": [
+    "pokemon",
+    "pokeapi",
     "ai",
     "agents",
     "claude-code",
@@ -38,12 +41,13 @@
     "pixel-art",
     "monitor"
   ],
-  "author": "Lucas Chacon",
+  "author": "Adriano",
+  "contributors": ["Lucas Chacon (original coworking-agents)"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ChaconLucas/coworking-agents.git"
+    "url": "git+https://github.com/adrianoads910-max/pokemon-coworking.git"
   },
-  "homepage": "https://github.com/ChaconLucas/coworking-agents#readme",
-  "bugs": "https://github.com/ChaconLucas/coworking-agents/issues",
+  "homepage": "https://github.com/adrianoads910-max/pokemon-coworking#readme",
+  "bugs": "https://github.com/adrianoads910-max/pokemon-coworking/issues",
   "license": "MIT"
 }

@@ -20,7 +20,7 @@ function plan(now) {
   const byZone = { lounge: [], nap: [], meet: [], desk: [], leave: [] };
   for (const c of layout) byZone[zoneFor(c)].push(c);
   const lounge = byZone.lounge, free = [];
-  if (lounge.length >= 2) { assign.set(lounge[0].p.id, spots.ping[0]); assign.set(lounge[1].p.id, spots.ping[1]); free.push(...lounge.slice(2)); }
+  if (!Poke.on && lounge.length >= 2) { assign.set(lounge[0].p.id, spots.ping[0]); assign.set(lounge[1].p.id, spots.ping[1]); free.push(...lounge.slice(2)); }
   else free.push(...lounge);
   const rest = lifeAssign(free, assign); // coffee after a long task, foosball, the water cooler
   const taken = new Set(assign.values()), seats = [...spots.sofa, ...spots.stools, ...spots.coffee].filter(s => !taken.has(s));

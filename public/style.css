@@ -761,3 +761,75 @@ body:has(.deco-bar:not([hidden])) #overlay { cursor: move; }
 table.score { width: 100%; border-collapse: collapse; font-size: 13px; }
 table.score th, table.score td { padding: 3px 6px; text-align: right; border-bottom: 1px solid #c9b896; }
 table.score th:first-child, table.score td:first-child { text-align: left; }
+
+/* Bioma theme (Pokémon skin) — tokens from the "Bioma Coworking" design system */
+body.poke { --b-navy: #1b2a4a; --b-border: #f4f4f0; --b-out: #1a1218; --b-paper: #fbf8ef; --b-muted: #5a5160; }
+body.poke .bar { background: #0f1426; border-bottom-color: var(--b-out); box-shadow: none; }
+body.poke .bar .hud { background: var(--b-navy); border: 2px solid var(--b-border); outline: 2px solid var(--b-out); border-radius: 4px; box-shadow: 3px 3px 0 rgba(0,0,0,.35); }
+body.poke .brand .logo { display: none; }
+body.poke .brand b { font-size: 0; }
+body.poke .brand b::after { content: attr(data-title); text-transform: uppercase; font: 700 16px/1 var(--pix); color: #fff; letter-spacing: .04em; }
+body.poke .brand small { color: #b8b2c4; }
+body.poke .bar .hud .counts { border-left-color: rgba(244,244,240,.18); }
+body.poke .bar .counts .stat { color: #fff; }
+body.poke .bar .counts .stat + .stat { border-left-color: rgba(244,244,240,.12); }
+body.poke .bar .counts .stat:nth-child(1) { --c: #5fd38a !important; }
+body.poke .bar .counts .stat:nth-child(2) { --c: #ff6b5e !important; }
+body.poke .bar .counts .stat:nth-child(3) { --c: #ffd24a !important; }
+body.poke .bar .counts .stat:nth-child(4) { --c: #a8b4f0 !important; }
+body.poke .bar .counts .stat b { color: #fff; font-size: 16px; }
+body.poke .bar .counts .stat small { color: var(--c); font: 700 9px/1 var(--pix); text-transform: uppercase; }
+body.poke .bar .counts .stat i { width: 9px; height: 11px; border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%; background: linear-gradient(var(--c) 0 42%, #fff 42% 56%, #2a3550 56%); box-shadow: 0 0 0 1px var(--b-out); }
+body.poke .bar .counts .stat.need { background: none; animation: none; }
+body.poke .bar .counts .stat.need small { color: var(--c); }
+body.poke .bar .counts .stat.need i { animation: bioma-blink .8s steps(1) infinite; }
+@keyframes bioma-blink { 50% { background: #fff; } }
+body.poke .toast { background: var(--b-navy); color: #ffd24a; border: 2px solid var(--b-border); outline: 2px solid var(--b-out); border-radius: 4px; font: 700 10px/1.35 var(--pix); text-transform: uppercase; box-shadow: 3px 3px 0 rgba(0,0,0,.4); }
+body.poke .toast b { color: #fff; font-size: 13px; }
+/* the paper label under each desk: name + tool / task / state */
+.tag.bioma { display: flex; flex-direction: column; gap: 2px; text-align: left; background: var(--b-paper); border: 2px solid var(--b-out); border-radius: 0; padding: 3px 5px; box-shadow: 2px 2px 0 rgba(26,18,24,.35); font: 700 9px/1.15 var(--pix); text-transform: uppercase; color: var(--b-out); }
+.tag.bioma .nm, .tag.bioma .tt, .tag.bioma .st { all: unset; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font: 700 9px/1.15 var(--pix); }
+.tag.bioma .nm { display: flex; justify-content: space-between; gap: 6px; }
+.tag.bioma .nm b { overflow: hidden; text-overflow: ellipsis; }
+.tag.bioma .nm i { font-style: normal; color: var(--tool-ink); flex: none; }
+.tag.bioma .tt { color: var(--b-muted); }
+.tag.bioma .st { display: flex; align-items: center; gap: 4px; color: var(--st-ink); }
+.tag.bioma .st::before { content: ''; width: 5px; height: 5px; flex: none; background: var(--st); outline: 1px solid var(--b-out); }
+.tag.bioma.sel { outline: 2px solid #ffd24a; outline-offset: 1px; }
+#office.compact .tag.bioma .tt { display: block; }
+/* the room plaque in its type colour, on the room's header band */
+.room-sign.bioma { background: var(--type); border: 1px solid var(--b-out); border-radius: 0; color: var(--b-out); font: 700 9px/1 var(--pix); text-transform: uppercase; padding: 2px 5px; }
+body.poke .away { background: var(--b-paper); color: var(--b-out); border: 1px solid var(--b-out); border-radius: 0; text-transform: uppercase; }
+body.poke .away.intern { background: #ffd24a; }
+body.poke .tv-count { background: var(--b-navy); color: #fff; border-color: var(--b-border); text-transform: uppercase; }
+body.poke .hcard .face[data-poke] { width: auto; height: 72px; }
+body.poke .hcard .balloon { background: var(--b-navy); color: #fff; border: 2px solid var(--b-border); outline: 2px solid var(--b-out); border-radius: 4px; }
+body.poke .hcard .balloon::before { border-right-color: var(--b-border); }
+body.poke .hcard .balloon p b { color: #ff6b5e; text-transform: uppercase; }
+body.poke .hcard.done .balloon p b { color: #ffd24a; }
+body.poke .hcard .hb { background: var(--b-paper); border-color: var(--b-out); border-radius: 0; color: var(--b-out); text-transform: uppercase; }
+body.poke .hcard .hb.main { background: #ffd24a; }
+/* the Bioma office keeps only the work: no shop, achievements, paper, customising, radio or photo */
+body.poke #btn-radio, body.poke #btn-photo, body.poke #btn-deco, body.poke #btn-office { display: none; }
+body.poke .rtabs [data-tab="paper"], body.poke .rtabs [data-tab="ach"], body.poke .rtabs [data-tab="shop"], body.poke .rtabs [data-tab="office"] { display: none; }
+body.poke #certs-h, body.poke .panel .certs, body.poke .ph-dice, body.poke .ph-reset { display: none; }
+/* Bioma: the Pokémon card in the agent panel */
+.poke-card { border: 2px solid var(--b-out, #1a1218); background: var(--b-navy, #1b2a4a); color: #fff; border-radius: 4px; outline: 2px solid var(--b-border, #f4f4f0); outline-offset: -4px; padding: 12px 14px; }
+.poke-card small { color: #b8b2c4; }
+.poke-card .pk-head { display: flex; align-items: baseline; gap: 8px; font: 700 14px/1.2 var(--pix); text-transform: uppercase; }
+.poke-card .pk-no { color: #b8b2c4; font-size: 11px; }
+.poke-card .pk-lv { margin-left: auto; color: #ffd24a; }
+.poke-card .pk-types { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; align-items: center; }
+.poke-card .pk-types span { font: 700 9px/1 var(--pix); text-transform: uppercase; color: #1a1218; padding: 3px 6px; border: 1px solid #1a1218; }
+.poke-card .pk-types .pk-evo { background: none; border: 0; color: #b8b2c4; margin-left: auto; }
+.poke-card .pk-xp { height: 6px; background: #2a3550; border: 1px solid #1a1218; }
+.poke-card .pk-xp i { display: block; height: 100%; background: #7fc8ff; }
+.poke-card h3 { color: #fff; margin: 12px 0 6px; }
+.poke-card .pk-moves { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.poke-card .pk-moves li { background: #fbf8ef; color: #1a1218; border: 2px solid #1a1218; border-left: 6px solid var(--t); padding: 6px 8px; }
+.poke-card .pk-mv { display: flex; align-items: center; gap: 6px; font: 700 11px/1.2 var(--pix); text-transform: uppercase; }
+.poke-card .pk-ty { font-size: 8px; color: #1a1218; background: var(--t); padding: 2px 4px; border: 1px solid #1a1218; }
+.poke-card .pk-ml { margin-left: auto; color: #5a5160; font-size: 9px; }
+.poke-card .pk-st { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; font-size: 11px; color: #5a5160; }
+.poke-card .pk-st b { color: #1a1218; }
+.poke-card .pk-moves p { margin: 4px 0 0; font-size: 11px; color: #5a5160; line-height: 1.35; }

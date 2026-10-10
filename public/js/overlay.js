@@ -44,6 +44,12 @@ function renderOverlay() {
     const cls = p.state === 'needs_you' ? 'need' : p.state === 'waiting' ? 'wait' : '';
     const repo = p.repo ? `${p.repo.name}${p.branch && p.branch !== 'HEAD' ? ' · ' + p.branch : ''}` : '';
     parts.push(`<div class="desk-hit" data-id="${esc(p.id)}" style="left:${x * S}px;top:${(y + 14) * S}px;width:${CELL_W * S}px;height:${54 * S}px"></div>`);
+    if (Poke.on) { // Bioma: the design's paper label — name and tool, current task, state
+      tags.push(`<button class="tag bioma ${cls} ${selected === p.id ? 'sel' : ''}" data-id="${esc(p.id)}" style="left:${(x + CELL_W / 2) * S}px;top:${(y + 62) * S}px;width:${92 * S}px;${Bioma.tagStyle(p)}">
+      <span class="nm"><b>${esc(p.name)}</b><i>${esc(agentOf(p).label)}</i></span>
+      <span class="tt" title="${esc(p.title)}">${esc((p.doing && p.doing.what) || p.title || repo || '—')}</span>
+      <span class="st" title="${esc(stateText(p))}">${esc(Bioma.stateLabel(p))}</span></button>`);
+    } else
     tags.push(`<button class="tag ${cls} ${selected === p.id ? 'sel' : ''}" data-id="${esc(p.id)}" style="left:${(x + CELL_W / 2) * S}px;top:${(y + 72) * S}px;max-width:${CELL_W * S - 8}px">
       <span class="nm" style="--ag:${agentOf(p).color}" title="${esc(agentOf(p).label)}">${esc(p.name)}</span>
       <span class="tt" title="${esc(p.title)}">${esc(p.title || repo || '—')}</span>
@@ -67,7 +73,8 @@ function renderOverlay() {
     const g = roomGit(R), G = T.git;
     const gitTxt = g ? `${g.dirty ? `<b class="g-dirty">●${g.dirty}</b>` : ''}${g.ahead ? `<b class="g-up">↑${g.ahead}</b>` : ''}${g.behind ? `<b class="g-down">↓${g.behind}</b>` : ''}` : '';
     const gitTitle = g ? ' · ' + [g.dirty ? G.dirty(g.dirty) : G.clean, g.ahead ? G.ahead(g.ahead) : '', g.behind ? G.behind(g.behind) : ''].filter(Boolean).join(' · ') : '';
-    tags.push(`<span class="room-sign" style="left:${(R.x + 12) * S}px;top:${(R.y - 1) * S}px;max-width:${(R.w - 16) * S}px" title="${esc(R.name + gitTitle)}"><span class="rs-name">${esc(R.name)}</span> <em>${R.people.length}</em>${gitTxt}</span>`);
+    if (Poke.on) tags.push(`<span class="room-sign bioma" style="left:${(R.x + 4) * S}px;top:${(R.y + 7) * S}px;max-width:${(R.w - 34) * S}px;--type:${Bioma.typeColor(R)}" title="${esc(R.name + gitTitle)}"><span class="rs-name">${esc(Bioma.signName(R))} - ${esc(R.name)}</span>${gitTxt}</span>`);
+    else tags.push(`<span class="room-sign" style="left:${(R.x + 12) * S}px;top:${(R.y - 1) * S}px;max-width:${(R.w - 16) * S}px" title="${esc(R.name + gitTitle)}"><span class="rs-name">${esc(R.name)}</span> <em>${R.people.length}</em>${gitTxt}</span>`);
   }
   for (const cell of layout) {
     const a = cell.actor;
@@ -92,7 +99,8 @@ function renderOverlay() {
   if (boardBox && data) { const c = counts(); parts.push(`<div class="hit wall-switch" data-tab="today" title="${esc(T.today.title)} · "${c.work} ${esc(T.working)} · ${c.need} ${esc(T.needYou)} · ${c.turn} ${esc(T.yourTurn)} · ${c.sleep} ${esc(T.asleep)}" style="left:${boardBox.x * S}px;top:${boardBox.y * S}px;width:${boardBox.w * S}px;height:${boardBox.h * S}px"></div>`); }
   const box = (b, attr, title) => b ? parts.push(`<button class="wall-switch" ${attr} title="${esc(title)}" style="left:${b.x * S}px;top:${b.y * S}px;width:${b.w * S}px;height:${b.h * S}px"></button>`) : 0;
   { const m = usageData && usageData.month && usageData.month.top && usageData.month.top[0], live = m && data && data.people.find(p => p.id === m.id);
-    box(aotmBox, 'data-ach="1"', m ? T.ach.aotmTip((live && live.name) || m.title || m.id.slice(0, 8), Math.round(m.activeMs / 36e5), m.tools) : T.ach.noMonth); }
+    // Bioma has no achievements screen: the partner of the month opens that session's panel
+    box(aotmBox, Poke.on && live ? `data-id="${esc(live.id)}"` : 'data-ach="1"', m ? T.ach.aotmTip((live && live.name) || m.title || m.id.slice(0, 8), Math.round(m.activeMs / 36e5), m.tools) : T.ach.noMonth); }
   box(trophyBox, 'data-trophyroom="1"', T.trophy.shelf);
   for (const g of gameHits) box(g, g.attr, g.title);
   { const working = data ? data.people.filter(p => !p.leaving && !['idle', 'asleep', 'needs_you', 'waiting'].includes(p.state)).length : 0;

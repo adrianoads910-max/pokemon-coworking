@@ -28,7 +28,7 @@ function weekMissions() {
   return out.map(m => { const v = m.value(), done = achCount('missionsDone') && (prog.record.missionsDone || []).includes(wk + ':' + m.id); return { ...m, v, done: done || v >= m.goal, claimed: done, key: wk + ':' + m.id }; });
 }
 function checkMissions() {
-  if (!usageData || !usageData.days) return;
+  if (Poke.on || !usageData || !usageData.days) return;
   for (const m of weekMissions()) if (!m.claimed && m.v >= m.goal) {
     achAdd('missionsDone', m.key); achBump('missionCoins', 100);
     toast(`<b>${esc(T.missions.done)}</b>${esc(T.missions.list[m.id](m.goal))} · +100 ${esc(T.ach.coins)}`, 'ok'); playTune('trophy');
