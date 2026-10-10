@@ -43,7 +43,9 @@ function renderUsage(P) {
     <p class="note">${esc(U.note)}</p>`;
 }
 
-// Bioma theme: the session's Pokémon — number, types, level (from its turns) and the moves it knows
+// Bioma theme: the session's Pokémon — number, types, level (from its turns); a switch between its big
+// official artwork (first) and the moves it knows
+let pokeSlide = 0;
 function pokeCard(p) {
   const c = Poke.on && Poke.cardOf(p), K = T.panel.poke;
   if (!c) return '';
@@ -56,12 +58,13 @@ function pokeCard(p) {
     <div class="pk-head"><b>${esc(cap(c.info.name))}</b><span class="pk-no">#${String(c.mon).padStart(3, '0')}</span><span class="pk-lv" title="${esc(K.levelNote)}">${esc(K.lv)} ${c.level}</span></div>
     <div class="pk-types">${c.info.types.map(t => `<span style="background:${TC[t] || '#888'}">${esc(tname(t))}</span>`).join('')}<span class="pk-evo">${esc(evo)}</span></div>
     <div class="pk-xp" title="${esc(K.levelNote)}"><i style="width:${pct.toFixed(1)}%"></i></div>
-    <h3>${esc(K.moves)}</h3>
-    <ul class="pk-moves">${c.moves.map(m => `<li style="--t:${TC[m.type] || '#8a8f98'}">
+    <div class="pk-switch" role="tablist">${[K.photo, K.moves].map((l, i) => `<button role="tab" data-pk-slide="${i}" aria-selected="${pokeSlide === i}">${esc(l)}</button>`).join('')}</div>
+    ${pokeSlide === 0 ? `<div class="pk-art"><img src="/api/pokemon/sprite/art/${c.mon}.png" alt="${esc(cap(c.info.name))}" width="200" height="200"></div>` : `    <ul class="pk-moves">${c.moves.map(m => `<li style="--t:${TC[m.type] || '#8a8f98'}">
       <div class="pk-mv"><b>${esc(m.label || m.name)}</b>${m.type ? `<span class="pk-ty">${esc(tname(m.type))}</span>` : ''}<span class="pk-ml">${esc(K.lv)} ${m.level}</span></div>
-      ${m.type ? `<div class="pk-st"><span>${esc(K.power)} <b>${m.power ?? '—'}</b></span><span>${esc(K.acc)} <b>${m.accuracy != null ? m.accuracy + '%' : '—'}</b></span><span>${esc(K.pp)} <b>${m.pp ?? '—'}</b></span><span>${esc(K.cls[m.cls] || m.cls)}</span></div>${m.effect ? `<p>${esc(m.effect)}</p>` : ''}` : ''}</li>`).join('')}</ul>
+      ${m.type ? `<div class="pk-st"><span>${esc(K.power)} <b>${m.power ?? '—'}</b></span><span>${esc(K.acc)} <b>${m.accuracy != null ? m.accuracy + '%' : '—'}</b></span><span>${esc(K.pp)} <b>${m.pp ?? '—'}</b></span><span>${esc(K.cls[m.cls] || m.cls)}</span></div>${m.effect ? `<p>${esc(m.effect)}</p>` : ''}` : ''}</li>`).join('')}</ul>`}
   </section>`;
 }
+panelBody.addEventListener('click', e => { const b = e.target.closest('[data-pk-slide]'); if (b) { pokeSlide = Number(b.dataset.pkSlide); renderPanel(); } });
 function renderPanel() {
   document.body.classList.toggle('panel-open', !!(selected && data));
   if (!selected || !data) { panel.hidden = true; return; }

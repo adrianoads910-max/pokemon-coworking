@@ -34,15 +34,20 @@ function renderBuilding() {
   buildingEl.querySelectorAll('canvas[data-thumb]').forEach(c => { const g = c.getContext('2d'); g.imageSmoothingEnabled = false; thumbs[+c.dataset.thumb] = { c, g }; });
 }
 
+let thumbing = false; // true while another floor is drawn as a thumbnail
+const thumbErrors = new Map(); // floor -> last error message, so a broken thumbnail is reported once
 function drawThumbs(t, dt) {
+  thumbing = true;
   for (let i = 0; i < floorStates.length; i++) {
     const th = thumbs[i];
     if (!th) continue;
     useFloor(i);
     if (th.c.width !== W || th.c.height !== H) { th.c.width = W; th.c.height = H; th.g.imageSmoothingEnabled = false; }
     ctx = th.g; Art.setCtx(ctx);
-    try { drawScene(t, dt); } catch {}
+    try { drawScene(t, dt); thumbErrors.delete(i); }
+    catch (e) { if (thumbErrors.get(i) !== String(e)) { thumbErrors.set(i, String(e)); console.warn('coworking: floor ' + (i + 1) + ' thumbnail failed', e); } }
   }
+  thumbing = false;
   ctx = mainCtx; Art.setCtx(ctx); useFloor(floor);
 }
 

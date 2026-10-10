@@ -824,7 +824,6 @@ body.poke #certs-h, body.poke .panel .certs, body.poke .ph-dice, body.poke .ph-r
 .poke-card .pk-types .pk-evo { background: none; border: 0; color: #b8b2c4; margin-left: auto; }
 .poke-card .pk-xp { height: 6px; background: #2a3550; border: 1px solid #1a1218; }
 .poke-card .pk-xp i { display: block; height: 100%; background: #7fc8ff; }
-.poke-card h3 { color: #fff; margin: 12px 0 6px; }
 .poke-card .pk-moves { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .poke-card .pk-moves li { background: #fbf8ef; color: #1a1218; border: 2px solid #1a1218; border-left: 6px solid var(--t); padding: 6px 8px; }
 .poke-card .pk-mv { display: flex; align-items: center; gap: 6px; font: 700 11px/1.2 var(--pix); text-transform: uppercase; }
@@ -833,3 +832,12 @@ body.poke #certs-h, body.poke .panel .certs, body.poke .ph-dice, body.poke .ph-r
 .poke-card .pk-st { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; font-size: 11px; color: #5a5160; }
 .poke-card .pk-st b { color: #1a1218; }
 .poke-card .pk-moves p { margin: 4px 0 0; font-size: 11px; color: #5a5160; line-height: 1.35; }
+/* the card's switch: big artwork first, then the moves */
+.poke-card .pk-switch { display: flex; margin: 12px 0 8px; border: 2px solid var(--b-border, #f4f4f0); outline: 2px solid var(--b-out, #1a1218); border-radius: 4px; padding: 2px; gap: 2px; }
+.poke-card .pk-switch button { flex: 1; font: 700 10px/1 var(--pix); text-transform: uppercase; padding: 7px 4px; border: 0; border-radius: 2px; background: transparent; color: #b8b2c4; cursor: pointer; }
+.poke-card .pk-switch button[aria-selected="true"] { background: var(--b-border, #f4f4f0); color: var(--b-navy, #1b2a4a); }
+.poke-card .pk-switch button:focus-visible { outline: 2px solid #ffd24a; outline-offset: 1px; }
+.poke-card .pk-art { display: grid; place-items: center; background: radial-gradient(circle at 50% 55%, #2f4a80 0 45%, transparent 70%); border: 2px solid #2a3550; border-radius: 4px; padding: 6px; }
+.poke-card .pk-art img { width: 100%; max-width: 240px; height: auto; aspect-ratio: 1; filter: drop-shadow(0 6px 0 rgba(0,0,0,.25)); }
+.room-sign.wing-sign { z-index: 2; }
+body.poke .away { z-index: 1; }

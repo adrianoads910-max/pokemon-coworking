@@ -385,7 +385,9 @@ const Bioma = (() => {
   }
 
   // ---- service wing: healing centre, arena, gym, day care, servers ----
-  function wingHeader(k, x, y, w, title, col) { Rk(k, x, y, w, 14, '#2a3550'); Rk(k, x, y + 13, w, 1, OUT); const pw = tw(title) + 10; Rk(k, x + 4, y + 2, pw, 10, OUT); Rk(k, x + 5, y + 3, pw - 2, 8, col); text(k, title, x + 9, y + 4, OUT); }
+  // the band is drawn here; its plaque is HTML (overlay.js, wingSigns) so the name plaques of whoever
+  // stands near the top of a section never cover the section's title
+  function wingHeader(k, x, y, w) { Rk(k, x, y, w, 14, '#2a3550'); Rk(k, x, y + 13, w, 1, OUT); }
   const WING_TITLES = { pt: ['CENTRO DE CURA - SUA VEZ', 'GINASIO - DELEGANDO', 'CRECHE - DORMINDO'], en: ['HEALING CENTER - YOUR TURN', 'GYM - DELEGATING', 'DAY CARE - ASLEEP'] };
   function wingBoxes() { return [[wing.copa, wing.meet - 4], [wing.meet - 2, wing.nap - 4], [wing.nap - 2, wing.bottom]]; }
   function drawWingBG(k, t, lights) {
@@ -417,10 +419,9 @@ const Bioma = (() => {
     for (const sp of spots.nap) { const bx = sp.x + 10, by = sp.y + 14; disc(k, bx, by, 16, 6, OUT); disc(k, bx, by, 15, 5, '#d9b45a'); disc(k, bx, by - 1, 12, 3, '#c99e44'); for (let i = -12; i < 12; i += 4) Rk(k, bx + i, by + 3, 3, 1, '#b08a3a'); }
     napBox = null;
   }
-  function drawWingUI(k) {
-    const x = RX - 2, w = RW + 4, tl = WING_TITLES[lang] || WING_TITLES.pt, cols = ['#8fd8c8', '#bfe9f5', '#cfc2e8'];
-    wingBoxes().forEach(([a], i) => wingHeader(k, x, a, w, tl[i], cols[i]));
-  }
+  const WING_COLS = ['#8fd8c8', '#bfe9f5', '#cfc2e8'];
+  function drawWingUI(k) { for (const [a] of wingBoxes()) wingHeader(k, RX - 2, a, RW + 4); }
+  function wingSigns() { const tl = WING_TITLES[lang] || WING_TITLES.pt; return wing ? wingBoxes().map(([a], i) => ({ x: RX + 2, y: a + 7, title: tl[i], col: WING_COLS[i] })) : []; }
 
   // ---- the room header band (the plaque itself is the HTML room sign) ----
   function roomHeader(k, Rm, B) {
@@ -433,7 +434,8 @@ const Bioma = (() => {
     const now = Date.now(), k = Art.getCtx(), lights = [];
     const sky = Art.skyFor(styleHour(qs.get('hour') ? Number(qs.get('hour')) : new Date().getHours() + new Date().getMinutes() / 60));
     const night = sky.phase === 'night', dusk = !night && sky.phase !== 'day';
-    updateActors(dt, now); updateCat(dt, t); updatePlayer(dt);
+    updateActors(dt, now);
+    if (!thumbing) { updateCat(dt, t); updatePlayer(dt); }
     usageBox = null; neonBox = null; moodBox = null; boardBox = null; hallBox = null; tvBox = null; trophyBox = null; radioBox = null; aotmBox = null; sites = [];
     // ground: the village planks under everything
     Rk(k, 0, TOP, W, H - TOP, '#e3c99a');
@@ -482,8 +484,7 @@ const Bioma = (() => {
       if (a.mode === 'nap') movers.push({ y: a.y, draw: () => { creature(c.p, 'front', t, a.x + 10, a.y + 16, { dim: true, sleep: true }); zzz(k, a.x + 18, a.y - 2, t, Art.hash(c.p.id) % 2400); } });
       else movers.push({ y: a.y, draw: () => { ring(k, a.x + 8, a.y + 24, Poke.typeOfId(c.p.id) || 'normal', 1.4); creature(c.p, 'front', t, a.x + 8, a.y + 25 - bob, { flip: walking && a.flip }); if (a.mode === 'lounge' && a.spot && a.spot.zone === 'lounge' && a.y < wing.ping) ui.push({ st: 'ready', x: a.x - 7, y: a.y - 4 }); } });
     }
-    movers.push({ y: cat.y, draw: () => drawMascot(cat.x, cat.y, cat.mode, t, cat.flip) });
-    drawPlayer(t, movers);
+    if (!thumbing) { movers.push({ y: cat.y, draw: () => drawMascot(cat.x, cat.y, cat.mode, t, cat.flip) }); drawPlayer(t, movers); }
     movers.sort((a, b) => a.y - b.y).forEach(m => m.draw());
     // gym: the lead and its subagents (×1)
     const meet = layout.filter(c => c.actor && c.actor.mode === 'meet');
@@ -517,5 +518,5 @@ const Bioma = (() => {
   const signName = Rm => { const B = biomeOf(Rm); return lang === 'pt' ? B.pt : B.en; };
   const typeColor = Rm => TYPE_COLOR[biomeOf(Rm).type];
 
-  return { drawScene: drawBiomaScene, biomeOf, tagStyle, stateLabel, signName, typeColor, TYPE_COLOR, critter };
+  return { drawScene: drawBiomaScene, wingSigns, biomeOf, tagStyle, stateLabel, signName, typeColor, TYPE_COLOR, critter };
 })();

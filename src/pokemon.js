@@ -9,7 +9,7 @@ const CACHE = path.join(os.homedir(), '.config', 'coworking-agents', 'pokemon-ca
 const API = 'https://pokeapi.co/api/v2';
 const RAW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 const TYPES = new Set(['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy']);
-const KINDS = { icon: id => `${RAW}/versions/generation-vii/icons/${id}.png`, back: id => `${RAW}/back/${id}.png`, front: id => `${RAW}/${id}.png` };
+const KINDS = { art: id => `${RAW}/other/official-artwork/${id}.png`, icon: id => `${RAW}/versions/generation-vii/icons/${id}.png`, back: id => `${RAW}/back/${id}.png`, front: id => `${RAW}/${id}.png` };
 const MAX_ID = 807; // generation VII icons stop here
 // legendary and mythical Pokémon up to MAX_ID: kept out of the office by default
 const LEGENDS = new Set([144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386,
@@ -21,11 +21,16 @@ function once(key, fn) {
   if (!pending.has(key)) pending.set(key, fn().finally(() => pending.delete(key)));
   return pending.get(key);
 }
+// files PokéAPI answered 404 for (a sprite that doesn't exist): not asked again until the server restarts,
+// while network errors are, since the page retries them
+const missing = new Set();
 function cached(file, fetchIt) {
   const p = path.join(CACHE, file);
   try { return Promise.resolve(fs.readFileSync(p)); } catch {}
+  if (missing.has(file)) return Promise.reject(new Error('missing'));
   return once(file, async () => {
-    const buf = await fetchIt();
+    let buf;
+    try { buf = await fetchIt(); } catch (e) { if (e.status === 404) missing.add(file); throw e; }
     fs.mkdirSync(CACHE, { recursive: true });
     fs.writeFileSync(p, buf);
     return buf;
@@ -33,7 +38,7 @@ function cached(file, fetchIt) {
 }
 async function get(url) {
   const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
-  if (!r.ok) throw new Error(`${r.status} ${url}`);
+  if (!r.ok) throw Object.assign(new Error(`${r.status} ${url}`), { status: r.status });
   return Buffer.from(await r.arrayBuffer());
 }
 
@@ -113,7 +118,7 @@ function route(pathname) {
   if (m) return move(m[1]).then(body => ({ type: 'application/json', body }));
   m = /^\/api\/pokemon\/line\/(\d{1,3})$/.exec(pathname);
   if (m) return line(m[1]).then(body => ({ type: 'application/json', body }));
-  m = /^\/api\/pokemon\/sprite\/(icon|back|front)\/(\d{1,3})\.png$/.exec(pathname);
+  m = /^\/api\/pokemon\/sprite\/(art|icon|back|front)\/(\d{1,3})\.png$/.exec(pathname);
   if (m) return sprite(m[1], m[2]).then(body => ({ type: 'image/png', body }));
   return null;
 }

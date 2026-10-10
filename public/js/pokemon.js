@@ -19,19 +19,27 @@ const Poke = (() => {
 
   // ---- data from our server (type lists, evolution lines), fetched once per page ----
   const lists = {}, lines = {};
-  const getJSON = (bag, key, url) => {
-    if (!(key in bag)) { bag[key] = 'loading'; fetch(url).then(r => r.ok ? r.json() : Promise.reject()).then(v => { bag[key] = v; }, () => { bag[key] = null; }); }
-    return Array.isArray(bag[key]) && bag[key].length ? bag[key] : null;
+  // a failed request (PokéAPI offline, no network) is asked again after RETRY_MS instead of never
+  const RETRY_MS = 30000;
+  const load = (bag, key, url) => {
+    const v = bag[key];
+    if (v === undefined || (v && v.failedAt && Date.now() - v.failedAt > RETRY_MS)) {
+      bag[key] = 'loading';
+      fetch(url).then(r => r.ok ? r.json() : Promise.reject()).then(x => { bag[key] = x; }, () => { bag[key] = { failedAt: Date.now() }; });
+    }
+    return bag[key];
   };
+  const getJSON = (bag, key, url) => { const v = load(bag, key, url); return Array.isArray(v) && v.length ? v : null; };
   const typeList = t => getJSON(lists, t, '/api/pokemon/type/' + t);
   const lineOf = id => getJSON(lines, id, '/api/pokemon/line/' + id);
 
   // ---- sprites: cropped to their pixels and shrunk by a whole factor so they stay crisp ----
   const imgs = new Map();
   function spr(kind, id, maxH) {
-    const key = kind + id + '/' + maxH;
+    const key = kind + id + '/' + maxH, old = imgs.get(key);
+    if (old && old.failed && Date.now() - old.at > RETRY_MS) imgs.delete(key);
     if (!imgs.has(key)) {
-      const e = { c: null, failed: false }, im = new Image();
+      const e = { c: null, failed: false, at: Date.now() }, im = new Image();
       im.onload = () => {
         const s = document.createElement('canvas'); s.width = im.width; s.height = im.height;
         const g = s.getContext('2d'); g.drawImage(im, 0, 0);
@@ -47,7 +55,7 @@ const Poke = (() => {
         const wg = wc.getContext('2d'); wg.drawImage(c, 0, 0); wg.globalCompositeOperation = 'source-in'; wg.fillStyle = '#ffffff'; wg.fillRect(0, 0, wc.width, wc.height);
         e.c = c; e.white = wc;
       };
-      im.onerror = () => { e.failed = true; };
+      im.onerror = () => { e.failed = true; e.at = Date.now(); };
       im.src = `/api/pokemon/sprite/${kind}/${id}.png`;
       imgs.set(key, e);
     }
@@ -94,10 +102,7 @@ const Poke = (() => {
 
   // ---- the panel's Pokémon card: level from use, the 4 latest moves it knows at that level ----
   const infos = {}, moveData = {};
-  const getObj = (bag, key, url) => {
-    if (!(key in bag)) { bag[key] = 'loading'; fetch(url).then(r => r.ok ? r.json() : Promise.reject()).then(v => { bag[key] = v; }, () => { bag[key] = null; }); }
-    return bag[key] && typeof bag[key] === 'object' ? bag[key] : null;
-  };
+  const getObj = (bag, key, url) => { const v = load(bag, key, url); return v && typeof v === 'object' && !v.failedAt ? v : null; };
   const levelOf = turns => Math.min(100, 5 + (turns || 0)); // 1 turn of conversation = 1 level, from level 5
   function cardOf(p) {
     if (!on || !sprites()) return null;

@@ -92,6 +92,7 @@ function renderOverlay() {
     tags.push(`<span class="away ${m.lead ? '' : 'intern'}" title="${esc(m.title || m.label)}" style="left:${(m.spot.x + 8) * S}px;top:${(m.spot.y - lift) * S}px">${esc(m.lead ? shortName(m.label) : m.label)}</span>`);
   });
   if (meetInfo.subTotal) tags.push(`<span class="tv-count" style="left:${(RX + 17) * S}px;top:${(wing.meet + 34) * S}px">${esc(T.subagents(meetInfo.subTotal))}${meetInfo.subTotal > meetInfo.shown ? ' · +' + (meetInfo.subTotal - meetInfo.shown) : ''}</span>`);
+  if (Poke.on) for (const w of Bioma.wingSigns()) tags.push(`<span class="room-sign bioma wing-sign" style="left:${w.x * S}px;top:${w.y * S}px;--type:${w.col}">${esc(w.title)}</span>`);
   if (napBox) tags.push(`<span class="room-sign" style="left:${(napBox.x + 10) * S}px;top:${(napBox.y - 2) * S}px">${esc(T.restRoom)}</span>`);
   for (const wb of windowBoxes) parts.push(`<button class="wall-switch" data-weather="1" title="${esc(weather ? T.weather.now(weather.temp) : T.weather.ask)}" style="left:${wb.x * S}px;top:${wb.y * S}px;width:${wb.w * S}px;height:${wb.h * S}px"></button>`);
   if (usageBox) parts.push(`<button class="wall-switch usage-hit" data-usage="1" title="${esc(usageGauges().map(m => `${m.label}: ${Math.round(m.pct)}%${m.resetsAt ? ` (${T.usage.resets} ${untilText(m.resetsAt)})` : ''}`).concat([T.usage.open]).join('\n'))}" style="left:${usageBox.x * S}px;top:${usageBox.y * S}px;width:${usageBox.w * S}px;height:${usageBox.h * S}px"></button>`);
